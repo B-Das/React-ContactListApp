@@ -1,3 +1,29 @@
+# CONTACT LIST APP
+
+The Contact List App is a simple web application built with React that allows users to manage their contacts. It provides features such as fetching and displaying contacts from an API, adding new contacts, updating existing contacts, and deleting contacts.
+## Features
+---------------------------------------
+* Fetches and shows users from the API (https://jsonplaceholder.typicode.com/users).
+* Adds a contact by making a POST call to the API (dummy request).
+* Updates a contact by making a PUT call to the API (dummy request).
+* Deletes a contact by making a DELETE call to the API (dummy request).
+* Provides a separate component for adding a contact.
+* Styling using Bootstrap for a responsive and visually appealing UI.
+* Uses gradient backgrounds and color texts to enhance the design.
+* Adds shadow effect to list items for a visually appealing layout.
+## Usage
+---------------------------------------
+1. The Contact List App will be displayed with an empty contact list.
+
+1. To add a new contact, fill in the name and email fields in the "Add Contact" form and click the "Add Contact" button. The contact will be added to the list.
+
+1. To update a contact, click the "Edit" button next to the contact you want to update. The contact details will be displayed in editable fields. Modify the name or email, and click the "Save" button to update the contact.
+
+1. To delete a contact, click the "Delete" button next to the contact you want to remove. The contact will be removed from the list.
+
+You can try out the Contact List App online [Here]()
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
