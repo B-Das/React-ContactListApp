@@ -21,7 +21,9 @@ The Contact List App is a simple web application built with React that allows us
 
 1. To delete a contact, click the "Delete" button next to the contact you want to remove. The contact will be removed from the list.
 
-You can try out the Contact List App online [Here](https://celebrated-kataifi-bc4bbb.netlify.app/)//  https://celebrated-kataifi-bc4bbb.netlify.app/
+You can try out the Contact List App online [Here](https://celebrated-kataifi-bc4bbb.netlify.app/)
+## hosted link
+https://celebrated-kataifi-bc4bbb.netlify.app/
 
 
 # Getting Started with Create React App
