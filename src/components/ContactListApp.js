@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import AddContactForm from './AddContactForm';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import AddContactForm from "./AddContactForm";//import add contacts component
+import Loading from "./Loading"; //import loading component
 
 const ContactListApp = () => {
   const [contacts, setContacts] = useState([]);
   const [editingContactId, setEditingContactId] = useState(null);
-  const [editedName, setEditedName] = useState('');
-  const [editedEmail, setEditedEmail] = useState('');
+  const [editedName, setEditedName] = useState("");
+  const [editedEmail, setEditedEmail] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [addingContact, setAddingContact] = useState(false);
 
   useEffect(() => {
     fetchContacts();
@@ -15,20 +18,29 @@ const ContactListApp = () => {
   // Fetch contacts from the API
   const fetchContacts = async () => {
     try {
-      const response = await axios.get('https://jsonplaceholder.typicode.com/users');
+      const response = await axios.get(
+        "https://jsonplaceholder.typicode.com/users"
+      );
       setContacts(response.data);
+      setLoading(false);
     } catch (error) {
-      console.log('Error fetching contacts:', error);
+      console.log("Error fetching contacts:", error);
     }
   };
 
   // Add a new contact
   const addContact = async (contact) => {
     try {
-      const response = await axios.post('https://jsonplaceholder.typicode.com/users', contact);
+      setAddingContact(true); // Set addingContact to true while adding a new contact
+      const response = await axios.post(
+        "https://jsonplaceholder.typicode.com/users",
+        contact
+      );
       setContacts([...contacts, response.data]);
     } catch (error) {
-      console.log('Error adding contact:', error);
+      console.log("Error adding contact:", error);
+    } finally {
+      setAddingContact(false); // Set addingContact back to false after adding the contact (whether successful or not)
     }
   };
 
@@ -42,39 +54,33 @@ const ContactListApp = () => {
   // Cancel editing a contact
   const cancelEditingContact = () => {
     setEditingContactId(null);
-    setEditedName('');
-    setEditedEmail('');
+    setEditedName("");
+    setEditedEmail("");
   };
 
   // Update a contact
   const updateContact = (contactId) => {
     try {
-      // Find the contact to be updated in the state based on the contactId
-      const updatedContact = contacts.find((contact) => contact.id === contactId);
-
-      // Update the name and email of the contact
+      const updatedContact = contacts.find(
+        (contact) => contact.id === contactId
+      );
       updatedContact.name = editedName;
       updatedContact.email = editedEmail;
-
-      // Update the state with the modified contact
       setContacts([...contacts]);
-
-      // Reset the editing state
       setEditingContactId(null);
-      setEditedName('');
-      setEditedEmail('');
+      setEditedName("");
+      setEditedEmail("");
     } catch (error) {
-      console.log('Error updating contact:', error);
+      console.log("Error updating contact:", error);
     }
   };
 
   // Delete a contact
   const deleteContact = (contactId) => {
     try {
-      // Remove the contact from the state based on the contactId
       setContacts(contacts.filter((contact) => contact.id !== contactId));
     } catch (error) {
-      console.log('Error deleting contact:', error);
+      console.log("Error deleting contact:", error);
     }
   };
 
@@ -83,7 +89,9 @@ const ContactListApp = () => {
       <h1 className="mb-4">Contact List</h1>
       <AddContactForm onAddContact={addContact} />
       <hr />
-      {contacts.length === 0 ? (
+      {loading ? (
+        <Loading /> // Display the loading component if contacts are loading
+      ) : contacts.length === 0 ? (
         <p>No contacts available. Please add some.</p>
       ) : (
         <ul className="list-group">
@@ -130,7 +138,11 @@ const ContactListApp = () => {
                   <button
                     className="btn btn-sm btn-primary me-2"
                     onClick={() =>
-                      startEditingContact(contact.id, contact.name, contact.email)
+                      startEditingContact(
+                        contact.id,
+                        contact.name,
+                        contact.email
+                      )
                     }
                   >
                     Edit
@@ -147,6 +159,7 @@ const ContactListApp = () => {
           ))}
         </ul>
       )}
+      {addingContact && <Loading />} {/* Display the loading component while adding a new contact */}
     </div>
   );
 };
