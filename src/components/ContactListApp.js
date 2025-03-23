@@ -1,165 +1,64 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import AddContactForm from "./AddContactForm";//import add contacts component
-import Loading from "./Loading"; //import loading component
+import React, { useMemo, useEffect, useState } from "react";
+import { useQuery } from '@tanstack/react-query';
 
-const ContactListApp = () => {
-  const [contacts, setContacts] = useState([]);
-  const [editingContactId, setEditingContactId] = useState(null);
-  const [editedName, setEditedName] = useState("");
-  const [editedEmail, setEditedEmail] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [addingContact, setAddingContact] = useState(false);
+// Sample data to match the image
+const sampleContacts = [
+  { id: 1, name: "Jane Cooper", phone: "(270) 555-0117", avatar: "https://i.pravatar.cc/150?img=1" },
+  { id: 2, name: "Devon Lane", phone: "(308) 555-0121", avatar: "https://i.pravatar.cc/150?img=2" },
+  { id: 3, name: "Darrell Steward", phone: "(684) 555-0102", avatar: "https://i.pravatar.cc/150?img=3" },
+  { id: 4, name: "Devon Lane", phone: "(704) 555-0127", avatar: "https://i.pravatar.cc/150?img=4" },
+  { id: 5, name: "Courtney Henry", phone: "(505) 555-0125", avatar: "https://i.pravatar.cc/150?img=5" },
+  { id: 6, name: "Wade Warren", phone: "(225) 555-0118", avatar: "https://i.pravatar.cc/150?img=6" },
+  { id: 7, name: "Bessie Cooper", phone: "(406) 555-0120", avatar: "https://i.pravatar.cc/150?img=7" },
+  { id: 8, name: "Robert Fox", phone: "(480) 555-0103", avatar: "https://i.pravatar.cc/150?img=8" },
+  { id: 9, name: "Jacob Jones", phone: "(702) 555-0122", avatar: "https://i.pravatar.cc/150?img=9" },
+  { id: 10, name: "Jenny Wilson", phone: "(239) 555-0108", avatar: "https://i.pravatar.cc/150?img=10" }
+];
+
+const ContactListApp = ({ searchTerm = "" }) => {
+  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
 
   useEffect(() => {
-    fetchContacts();
+    const handleResize = () => setWindowHeight(window.innerHeight);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Fetch contacts from the API
-  const fetchContacts = async () => {
-    try {
-      const response = await axios.get(
-        "https://jsonplaceholder.typicode.com/users"
-      );
-      setContacts(response.data);
-      setLoading(false);
-    } catch (error) {
-      console.log("Error fetching contacts:", error);
-    }
-  };
+  const { data: contacts = sampleContacts } = useQuery({
+    queryKey: ['contacts'],
+    queryFn: () => Promise.resolve(sampleContacts),
+    initialData: sampleContacts,
+    staleTime: Infinity
+  });
 
-  // Add a new contact
-  const addContact = async (contact) => {
-    try {
-      setAddingContact(true); // Set addingContact to true while adding a new contact
-      const response = await axios.post(
-        "https://jsonplaceholder.typicode.com/users",
-        contact
-      );
-      setContacts([...contacts, response.data]);
-    } catch (error) {
-      console.log("Error adding contact:", error);
-    } finally {
-      setAddingContact(false); // Set addingContact back to false after adding the contact (whether successful or not)
-    }
-  };
-
-  // Start editing a contact
-  const startEditingContact = (contactId, name, email) => {
-    setEditingContactId(contactId);
-    setEditedName(name);
-    setEditedEmail(email);
-  };
-
-  // Cancel editing a contact
-  const cancelEditingContact = () => {
-    setEditingContactId(null);
-    setEditedName("");
-    setEditedEmail("");
-  };
-
-  // Update a contact
-  const updateContact = (contactId) => {
-    try {
-      const updatedContact = contacts.find(
-        (contact) => contact.id === contactId
-      );
-      updatedContact.name = editedName;
-      updatedContact.email = editedEmail;
-      setContacts([...contacts]);
-      setEditingContactId(null);
-      setEditedName("");
-      setEditedEmail("");
-    } catch (error) {
-      console.log("Error updating contact:", error);
-    }
-  };
-
-  // Delete a contact
-  const deleteContact = (contactId) => {
-    try {
-      setContacts(contacts.filter((contact) => contact.id !== contactId));
-    } catch (error) {
-      console.log("Error deleting contact:", error);
-    }
-  };
+  const filteredContacts = useMemo(() => {
+    return contacts.filter(contact =>
+      contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      contact.phone.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [contacts, searchTerm]);
 
   return (
-    <div className="container py-4">
-      <h1 className="mb-4">Contact List</h1>
-      <AddContactForm onAddContact={addContact} />
-      <hr />
-      {loading ? (
-        <Loading /> // Display the loading component if contacts are loading
-      ) : contacts.length === 0 ? (
-        <p>No contacts available. Please add some.</p>
-      ) : (
-        <ul className="list-group">
-          {contacts.map((contact) => (
-            <li
-              key={contact.id}
-              className="list-group-item shadow p-3 mb-2 bg-info bg-gradient text-dark rounded-5"
-            >
-              {editingContactId === contact.id ? (
-                // Edit mode for the contact
-                <div>
-                  <input
-                    type="text"
-                    className="form-control mb-2"
-                    placeholder="Name"
-                    value={editedName}
-                    onChange={(e) => setEditedName(e.target.value)}
-                  />
-                  <input
-                    type="email"
-                    className="form-control mb-2"
-                    placeholder="Email"
-                    value={editedEmail}
-                    onChange={(e) => setEditedEmail(e.target.value)}
-                  />
-                  <button
-                    className="btn btn-sm btn-success me-2"
-                    onClick={() => updateContact(contact.id)}
-                  >
-                    Save
-                  </button>
-                  <button
-                    className="btn btn-sm btn-secondary"
-                    onClick={cancelEditingContact}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              ) : (
-                // Display mode for the contact
-                <div>
-                  <h3>{contact.name}</h3>
-                  <p>Email: {contact.email}</p>
-                  <button
-                    className="btn btn-sm btn-primary me-2"
-                    onClick={() =>
-                      startEditingContact(
-                        contact.id,
-                        contact.name,
-                        contact.email
-                      )
-                    }
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="btn btn-sm btn-danger"
-                    onClick={() => deleteContact(contact.id)}
-                  >
-                    Delete
-                  </button>
-                </div>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-      {addingContact && <Loading />} {/* Display the loading component while adding a new contact */}
+    <div className="contacts-list">
+      <input
+        type="text"
+        className="form-control mb-3"
+        placeholder="Search contacts..."
+        onChange={(e) => searchTerm = e.target.value}
+      />
+      {filteredContacts.map(contact => (
+        <div key={contact.id} className="contact-item">
+          <img 
+            src={contact.avatar} 
+            alt={contact.name} 
+            className="contact-avatar"
+          />
+          <div className="contact-info">
+            <div className="contact-name">{contact.name}</div>
+            <div className="contact-phone">{contact.phone}</div>
+          </div>
+        </div>
+      ))}
     </div>
   );
 };

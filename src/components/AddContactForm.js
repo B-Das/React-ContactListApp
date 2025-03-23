@@ -1,49 +1,44 @@
-import React, { useState } from "react";
+import React, { useState, memo } from "react";
 
-const AddContactForm = ({ onAddContact }) => {
-  const [name, setName] = useState(""); // State for name input field
-  const [email, setEmail] = useState(""); // State for email input field
+const AddContactForm = memo(({ onAddContact }) => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    if (!name || !email) return; // Check if name or email is empty
-
-    onAddContact({ name, email }); // Call the onAddContact function with the new contact object
-
-    setName(""); // Clear the name field
-    setEmail(""); // Clear the email field
+    if (!name.trim() || !email.trim()) return;
+    onAddContact({ name: name.trim(), email: email.trim() });
+    setName("");
+    setEmail("");
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      {/* Name input field */}
-      <input
-        className="p-3 mb-2 bg-info bg-gradient text-dark rounded-5"
-        type="text"
-        placeholder="Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
-
-      {/* Email input field */}
-      <input
-        className="p-3 mb-2 bg-info bg-gradient text-dark rounded-5"
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-
-      {/* Submit button */}
-      <button
-        className="p-3 mb-2 bg-info bg-gradient text-dark rounded-5"
-        type="submit"
-      >
+    <form onSubmit={handleSubmit} className="mb-4">
+      <div className="mb-3">
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+      </div>
+      <div className="mb-3">
+        <input
+          type="email"
+          className="form-control"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+      </div>
+      <button type="submit" className="btn btn-primary">
         Add Contact
       </button>
     </form>
   );
-};
+});
 
 export default AddContactForm;

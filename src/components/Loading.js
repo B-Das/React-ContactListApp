@@ -1,7 +1,7 @@
-import React from "react";
+import React, { memo } from "react";
 import { Spinner } from "react-bootstrap";
 
-const Loading = () => {
+const Loading = memo(() => {
   return (
     <div className="d-flex align-items-center justify-content-center">
       <Spinner
@@ -15,6 +15,6 @@ const Loading = () => {
       <p className="m-0">Loading contacts...</p>
     </div>
   );
-};
+});
 
 export default Loading;
